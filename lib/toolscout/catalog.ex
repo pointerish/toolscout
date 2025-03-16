@@ -101,4 +101,21 @@ defmodule Toolscout.Catalog do
   def change_tool(%Tool{} = tool, attrs \\ %{}) do
     Tool.changeset(tool, attrs)
   end
+
+  def insert_from_gpt_response(tools_data) do
+    timestamp = DateTime.truncate(DateTime.utc_now(), :second)
+    tools_data =
+      Enum.map(tools_data, fn tool ->
+        Map.new(tool, fn {key, value} ->
+          case key do
+            "price" -> {String.to_atom(key), Decimal.new(String.replace("#{value}", "$", ""))}
+            _ -> {String.to_atom(key), value}
+          end
+        end)
+        |> Map.put(:inserted_at, timestamp)
+        |> Map.put(:updated_at, timestamp)
+      end)
+
+    Repo.insert_all(Tool, tools_data)
+  end
 end
