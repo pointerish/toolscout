@@ -1,7 +1,6 @@
 defmodule Toolscout.Catalog.Tool do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Toolscout.Repo
 
   schema "tools" do
     field :name, :string
@@ -19,5 +18,5 @@ defmodule Toolscout.Catalog.Tool do
     |> validate_required([:name, :description, :price, :image_link])
   end
 
- 
+
 end

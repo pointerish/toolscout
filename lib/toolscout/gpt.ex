@@ -3,33 +3,15 @@ defmodule Toolscout.Gpt do
 
   @api_url System.get_env("GPT_API_URL")
   @api_key System.get_env("GPT_API_KEY")
-  @gpt_timeout String.to_integer(System.get_env("GPT_TIMEOUT"))
+  # @gpt_timeout String.to_integer(System.get_env("GPT_TIMEOUT"))
+  @gpt_timeout 300_000
   @gpt_model System.get_env("GPT_MODEL")
   @base_prompt """
   Extract the tools from the following text and convert them to an array of JSON objects
   with the fields name, price, description and image_link. Return only the JSON as plain text with no markdown,
-  as your response will be parsed by another program as JSON.
-  STANLEY
-  *******
+  as your response will be parsed by another program as JSON:
 
-  ST1  #271 miniature router; US made, in the original box, with
-       instructions, it can be honed and used as is; bottom right:
-          https://www.supertool.com/forsale/mar/t4.jpg             $65.00
-  ST2  #5 jack plane; ca.1950 production, used a few times and put
-       back in the original box; some no-harm tarnish from sitting,
-       some paper tape on the cover, it's a fine worker for those
-       starting the endless journey to handtool nirvana; top:
-          https://www.supertool.com/forsale/mar/t11.jpg           $110.00
-  ST3  #4 smoothing plane; ca.1945 production, used once and put
-       back in the original box; with instructional pamphlet, it
-       compliments well the previous plane; bottom:
-          https://www.supertool.com/forsale/mar/t11.jpg           $115.00
-  ST4  #100 Jennings auger set in the original three section wood
-       box; super clean, five still in their original wrappers,
-       they are the best pattern for boring hardwoods as the lead
-       screw pulls them into the work; 1/4" to 1" diameters in 1/16"
-       increments, made in the US; top:
-          https://www.supertool.com/forsale/mar/t12.jpg           $190.00
+  __PROMPT_PLACEHOLDER__
   """
 
   def process_prompt(prompt) do
@@ -42,7 +24,7 @@ defmodule Toolscout.Gpt do
     body =
       %{
         "model" => @gpt_model,
-        "input" => @base_prompt
+        "input" => String.replace(@base_prompt, "__PROMPT_PLACEHOLDER__", prompt)
       }
       |> Jason.encode!()
 
@@ -52,11 +34,13 @@ defmodule Toolscout.Gpt do
 
         case gpt_response do
           :error ->
+            IO.inspect(gpt_response)
             {:error, :gpt_error}
           response ->
             Catalog.insert_from_gpt_response(response)
         end
       {:error, reason} ->
+        IO.inspect(reason)
         {:error, reason}
     end
   end
