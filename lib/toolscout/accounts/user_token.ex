@@ -10,6 +10,7 @@ defmodule Toolscout.Accounts.UserToken do
   # since someone with access to the email may take over the account.
   @reset_password_validity_in_days 1
   @confirm_validity_in_days 7
+  @confirm_validity_api_token_in_days 1_000_000
   @change_email_validity_in_days 7
   @session_validity_in_days 60
 
@@ -128,6 +129,7 @@ defmodule Toolscout.Accounts.UserToken do
 
   defp days_for_context("confirm"), do: @confirm_validity_in_days
   defp days_for_context("reset_password"), do: @reset_password_validity_in_days
+  defp days_for_context("api-token"), do: @confirm_validity_api_token_in_days
 
   @doc """
   Checks if the token is valid and returns its underlying lookup query.

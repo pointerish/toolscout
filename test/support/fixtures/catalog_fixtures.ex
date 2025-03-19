@@ -11,11 +11,10 @@ defmodule Toolscout.CatalogFixtures do
     {:ok, tool} =
       attrs
       |> Enum.into(%{
-        code: "some code",
         description: "some description",
         image_link: "some image_link",
         name: "some name",
-        price: "120.5"
+        price: 120.5
       })
       |> Toolscout.Catalog.create_tool()
 

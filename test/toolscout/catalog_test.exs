@@ -8,7 +8,7 @@ defmodule Toolscout.CatalogTest do
 
     import Toolscout.CatalogFixtures
 
-    @invalid_attrs %{code: nil, name: nil, description: nil, price: nil, image_link: nil}
+    @invalid_attrs %{name: nil, description: nil, price: nil, image_link: nil}
 
     test "list_tools/0 returns all tools" do
       tool = tool_fixture()
@@ -21,10 +21,9 @@ defmodule Toolscout.CatalogTest do
     end
 
     test "create_tool/1 with valid data creates a tool" do
-      valid_attrs = %{code: "some code", name: "some name", description: "some description", price: "120.5", image_link: "some image_link"}
+      valid_attrs = %{name: "some name", description: "some description", price: "120.5", image_link: "some image_link"}
 
       assert {:ok, %Tool{} = tool} = Catalog.create_tool(valid_attrs)
-      assert tool.code == "some code"
       assert tool.name == "some name"
       assert tool.description == "some description"
       assert tool.price == Decimal.new("120.5")
@@ -37,10 +36,9 @@ defmodule Toolscout.CatalogTest do
 
     test "update_tool/2 with valid data updates the tool" do
       tool = tool_fixture()
-      update_attrs = %{code: "some updated code", name: "some updated name", description: "some updated description", price: "456.7", image_link: "some updated image_link"}
+      update_attrs = %{name: "some updated name", description: "some updated description", price: "456.7", image_link: "some updated image_link"}
 
       assert {:ok, %Tool{} = tool} = Catalog.update_tool(tool, update_attrs)
-      assert tool.code == "some updated code"
       assert tool.name == "some updated name"
       assert tool.description == "some updated description"
       assert tool.price == Decimal.new("456.7")

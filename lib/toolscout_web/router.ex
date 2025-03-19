@@ -15,6 +15,7 @@ defmodule ToolscoutWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug :fetch_api_user
   end
 
   scope "/", ToolscoutWeb do
@@ -68,6 +69,7 @@ defmodule ToolscoutWeb.Router do
       on_mount: [{ToolscoutWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+      live "/tools", ToolsListLive
     end
   end
 
