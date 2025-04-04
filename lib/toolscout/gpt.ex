@@ -3,12 +3,13 @@ defmodule Toolscout.Gpt do
 
   @api_url System.get_env("GPT_API_URL")
   @api_key System.get_env("GPT_API_KEY")
-  # @gpt_timeout String.to_integer(System.get_env("GPT_TIMEOUT"))
   @gpt_timeout 300_000
   @gpt_model System.get_env("GPT_MODEL")
   @base_prompt """
   Extract the tools from the following text and convert them to an array of JSON objects
-  with the fields name, price, description and image_link. Return only the JSON as plain text with no markdown,
+  with the fields name, price, description and image_link. Each tool description has a piece of text
+  describing where in the photo the tools is located. It might say something like "Left bottom corner".
+  Don't remove that part. Return only the JSON as plain text with no markdown,
   as your response will be parsed by another program as JSON:
 
   __PROMPT_PLACEHOLDER__
@@ -34,13 +35,11 @@ defmodule Toolscout.Gpt do
 
         case gpt_response do
           :error ->
-            IO.inspect(gpt_response)
             {:error, :gpt_error}
           response ->
             Catalog.insert_from_gpt_response(response)
         end
       {:error, reason} ->
-        IO.inspect(reason)
         {:error, reason}
     end
   end

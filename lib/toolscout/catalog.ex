@@ -7,6 +7,7 @@ defmodule Toolscout.Catalog do
   alias Toolscout.Repo
 
   alias Toolscout.Catalog.Tool
+  alias Toolscout.Catalog.ToolBatch
 
   @doc """
   Returns the list of tools.
@@ -19,6 +20,24 @@ defmodule Toolscout.Catalog do
   """
   def list_tools do
     Repo.all(Tool)
+  end
+
+  @doc """
+  Returns the latest tool batch.
+
+  ## Examples
+
+      iex> get_latest_tool_batch()
+      [%ToolBatch{}, ...]
+
+  """
+  def get_latest_tool_batch do
+    query =
+      from t in ToolBatch,
+        order_by: [desc: t.inserted_at],
+        limit: 1
+
+    Repo.one(query)
   end
 
   @doc """
@@ -102,7 +121,15 @@ defmodule Toolscout.Catalog do
     Tool.changeset(tool, attrs)
   end
 
+  def hash_tool_batch(tools_data) do
+    :crypto.hash(:sha256, tools_data)
+    |> Base.encode16(case: :lower)
+  end
+
   def insert_from_gpt_response(tools_data) do
+    hash_value = hash_tool_batch(tools_data)
+    tool_batch = %ToolBatch{hash_value: hash_value}
+    Repo.insert!(tool_batch)
     timestamp = DateTime.truncate(DateTime.utc_now(), :second)
     tools_data =
       Enum.map(tools_data, fn tool ->
@@ -114,6 +141,7 @@ defmodule Toolscout.Catalog do
         end)
         |> Map.put(:inserted_at, timestamp)
         |> Map.put(:updated_at, timestamp)
+        |> Map.put(:tool_batch_id, tool_batch.id)
       end)
 
     Repo.insert_all(Tool, tools_data)
