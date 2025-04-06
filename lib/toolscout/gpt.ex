@@ -16,7 +16,9 @@ defmodule Toolscout.Gpt do
   """
 
   def process_prompt(prompt) do
-    # TODO: Implementing chunking here
+    dbg(@api_url)
+    dbg(@api_key)
+    dbg(@gpt_model)
     headers = [
       {"Content-Type", "application/json"},
       {"Authorization", "Bearer #{@api_key}"}
@@ -32,11 +34,13 @@ defmodule Toolscout.Gpt do
     case HTTPoison.post(@api_url, body, headers, timeout: @gpt_timeout, recv_timeout: @gpt_timeout) do
       {:ok, response} ->
         gpt_response = get_gpt_response(response)
+        dbg(gpt_response)
 
         case gpt_response do
           :error ->
             {:error, :gpt_error}
           response ->
+            dbg(response)
             Catalog.insert_from_gpt_response(response, prompt)
         end
       {:error, reason} ->
