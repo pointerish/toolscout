@@ -24,7 +24,7 @@ defmodule ToolscoutWeb.ToolsListLive do
 
   def render(assigns) do
     ~H"""
-    <div class="justify-center m-12">
+    <div class="w-[75%] mx-auto m-12">
 
       <h2 class="text-2xl font-bold text-gray-800 mb-2">Tool Catalog</h2>
 
@@ -39,17 +39,29 @@ defmodule ToolscoutWeb.ToolsListLive do
       </form>
       <.table id="tools" rows={@tools}>
         <:col :let={tool} label="Name">{tool.name}</:col>
-        <:col :let={tool} label="Description">{tool.description}</:col>
+        <:col :let={tool} label="Description">
+          <div>
+            <span><%= String.slice(tool.description, 0, 60) %>...</span>
+            <.link
+              phx-click={ToolscoutWeb.CoreComponents.show_modal(%JS{}, "desc-modal-#{tool.id}")}
+              class="ml-2 text-blue-600 hover:underline text-sm"
+            >
+              Show more
+            </.link>
+          </div>
+          <.modal id={"desc-modal-#{tool.id}"} title={"#{tool.name}"}>
+            <p class="text-gray-800 whitespace-pre-wrap"><%= tool.description %></p>
+          </.modal>
+        </:col>
         <:col :let={tool} label="Price">${tool.price}</:col>
         <:col :let={tool} label="Tool Photo">
-          <!-- Link triggers modal showing the picture -->
           <.link
             phx-click={ToolscoutWeb.CoreComponents.show_modal(%JS{}, "modal-#{tool.id}")}
             class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
           >
-            See Picture
+            Picture <.icon name="hero-eye"/>
           </.link>
-          <.modal id={"modal-#{tool.id}"}>
+          <.modal id={"modal-#{tool.id}"} title={"#{tool.name} | $#{tool.price}"}>
             <img src={tool.image_link} alt={"Image for #{tool.name}"} class="max-w-full" />
           </.modal>
         </:col>
@@ -58,7 +70,7 @@ defmodule ToolscoutWeb.ToolsListLive do
             navigate={"mailto:leach@supertool.com"} target="_blank"
             class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
           >
-            Send Email
+            Email <.icon name="hero-envelope"/>
           </.link>
         </:col>
       </.table>

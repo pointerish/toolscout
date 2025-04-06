@@ -82,6 +82,8 @@ defmodule Toolscout.ToolDataIngress do
   def is_tool_batch_new?(tools_data) do
     hash_value = Catalog.hash_tool_batch(tools_data)
     latest_tool_batch = Catalog.get_latest_tool_batch()
+    dbg(hash_value)
+    dbg(latest_tool_batch)
 
     case latest_tool_batch do
       nil ->

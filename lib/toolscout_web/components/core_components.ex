@@ -39,6 +39,7 @@ defmodule ToolscoutWeb.CoreComponents do
   attr :id, :string, required: true
   attr :show, :boolean, default: false
   attr :on_cancel, JS, default: %JS{}
+  attr :title, :string, required: false
   slot :inner_block, required: true
 
   def modal(assigns) do
@@ -68,6 +69,7 @@ defmodule ToolscoutWeb.CoreComponents do
               phx-click-away={JS.exec("data-cancel", to: "##{@id}")}
               class="shadow-zinc-700/10 ring-zinc-700/10 relative hidden rounded-2xl bg-white p-14 shadow-lg ring-1 transition"
             >
+              <p class="text-sm font-semibold leading-6 text-zinc-900 mb-2">{@title}</p>
               <div class="absolute top-6 right-5">
                 <button
                   phx-click={JS.exec("data-cancel", to: "##{@id}")}
