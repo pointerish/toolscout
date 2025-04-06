@@ -22,6 +22,7 @@ defmodule ToolscoutWeb.Router do
     pipe_through :browser
 
     live "/", ToolsListLive
+    get "/about", DashboardController, :about
   end
 
   scope "/api", ToolscoutWeb do
