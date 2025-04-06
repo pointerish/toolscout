@@ -31,7 +31,7 @@ defmodule Toolscout.Gpt do
       }
       |> Jason.encode!()
 
-    case HTTPoison.post(@api_url, body, headers, timeout: @gpt_timeout, recv_timeout: @gpt_timeout) do
+    case HTTPoison.post(api_url, body, headers, timeout: @gpt_timeout, recv_timeout: @gpt_timeout) do
       {:ok, response} ->
         gpt_response = get_gpt_response(response)
         dbg(gpt_response)
@@ -45,6 +45,9 @@ defmodule Toolscout.Gpt do
         end
       {:error, reason} ->
         {:error, reason}
+      error ->
+        dbg(error)
+        {:error, error}
     end
   end
 
