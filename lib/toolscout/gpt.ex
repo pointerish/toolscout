@@ -21,12 +21,12 @@ defmodule Toolscout.Gpt do
     dbg(gpt_model)
     headers = [
       {"Content-Type", "application/json"},
-      {"Authorization", "Bearer #{@api_key}"}
+      {"Authorization", "Bearer #{api_key}"}
     ]
 
     body =
       %{
-        "model" => @gpt_model,
+        "model" => gpt_model,
         "input" => String.replace(@base_prompt, "__PROMPT_PLACEHOLDER__", prompt)
       }
       |> Jason.encode!()

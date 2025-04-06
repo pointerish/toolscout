@@ -24,10 +24,11 @@ defmodule ToolscoutWeb.ToolDataIngress do
   defp process_tool_data(conn, raw_tool_data) do
     case ToolDataIngress.is_tool_batch_new?(raw_tool_data) do
       true ->
-        {new_added_tools_count, _} = Gpt.process_prompt(raw_tool_data)
+        Task.start(fn ->
+          Gpt.process_prompt(raw_tool_data)
+        end)
         json(conn, %{
-          message: "Tools added",
-          count: new_added_tools_count
+          message: "Tool batch is new. Processing started."
         })
       false ->
         json(conn, %{message: "Old tool batch. No new tools added."})

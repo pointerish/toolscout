@@ -54,24 +54,22 @@ defmodule ToolscoutWeb.ToolsListLive do
           </.modal>
         </:col>
         <:col :let={tool} label="Price">${tool.price}</:col>
-        <:col :let={tool} label="Tool Photo">
+        <:col :let={tool} label="Actions">
           <.link
             phx-click={ToolscoutWeb.CoreComponents.show_modal(%JS{}, "modal-#{tool.id}")}
             class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
           >
-            Picture <.icon name="hero-eye"/>
+            <.icon name="hero-eye"/>
           </.link>
-          <.modal id={"modal-#{tool.id}"} title={"#{tool.name} | $#{tool.price}"}>
-            <img src={tool.image_link} alt={"Image for #{tool.name}"} class="max-w-full" />
-          </.modal>
-        </:col>
-        <:col label="Actions">
           <.link
             navigate={"mailto:leach@supertool.com"} target="_blank"
             class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
           >
-            Email <.icon name="hero-envelope"/>
+            <.icon name="hero-envelope"/>
           </.link>
+          <.modal id={"modal-#{tool.id}"} title={"#{tool.name} | $#{tool.price}"}>
+            <img src={tool.image_link} alt={"Image for #{tool.name}"} class="max-w-full" />
+          </.modal>
         </:col>
       </.table>
     </div>
