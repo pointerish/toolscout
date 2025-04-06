@@ -126,10 +126,11 @@ defmodule Toolscout.Catalog do
     |> Base.encode16(case: :lower)
   end
 
-  def insert_from_gpt_response(tools_data) do
-    hash_value = hash_tool_batch(tools_data)
-    tool_batch = %ToolBatch{hash_value: hash_value}
-    Repo.insert!(tool_batch)
+  def insert_from_gpt_response(tools_data, raw_tool_data) do
+    hash_value = hash_tool_batch(raw_tool_data)
+    dbg(hash_value)
+    tool_batch = Repo.insert!(%ToolBatch{hash_value: hash_value})
+    dbg(tool_batch)
     timestamp = DateTime.truncate(DateTime.utc_now(), :second)
     tools_data =
       Enum.map(tools_data, fn tool ->

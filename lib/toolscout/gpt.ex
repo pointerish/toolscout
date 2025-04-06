@@ -37,7 +37,7 @@ defmodule Toolscout.Gpt do
           :error ->
             {:error, :gpt_error}
           response ->
-            Catalog.insert_from_gpt_response(response)
+            Catalog.insert_from_gpt_response(response, prompt)
         end
       {:error, reason} ->
         {:error, reason}

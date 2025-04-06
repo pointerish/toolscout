@@ -6,12 +6,18 @@ defmodule ToolscoutWeb.ToolDataIngress do
 
   def run(conn, params) do
     data = Map.get(params, "data")
-    leachy_link = ToolDataIngress.extract_leachy_link(data)
+    leachy_link =
+      ToolDataIngress.extract_leachy_link(data)
+      |> String.replace("=3D", "")
+    dbg(leachy_link)
     raw_tool_data = ToolDataIngress.extract_leachy_raw_data(leachy_link)
+    dbg(raw_tool_data)
 
     case raw_tool_data do
       {:error, reason} ->
         json(conn, %{error: "Failed to extract raw data: #{reason}"})
+      "" ->
+        json(conn, %{error: "Empty raw data"})
       _ ->
         process_tool_data(conn, raw_tool_data)
     end

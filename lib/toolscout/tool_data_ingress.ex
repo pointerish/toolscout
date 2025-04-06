@@ -83,9 +83,11 @@ defmodule Toolscout.ToolDataIngress do
     hash_value = Catalog.hash_tool_batch(tools_data)
     latest_tool_batch = Catalog.get_latest_tool_batch()
 
-    case latest_tool_batch.hash_value do
-      ^hash_value -> false
-      _ -> true
+    case latest_tool_batch do
+      nil ->
+        true
+      %Catalog.ToolBatch{hash_value: latest_hash_value} ->
+        latest_hash_value == hash_value
     end
   end
 
