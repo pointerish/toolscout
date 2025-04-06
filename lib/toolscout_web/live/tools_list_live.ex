@@ -6,24 +6,18 @@ defmodule ToolscoutWeb.ToolsListLive do
   def mount(_params, _session, socket) do
     tools = Catalog.list_tools()
 
-    socket =
-      socket
-      |> assign(
-        tools: tools,
-        search: "",
-        sort_dir: :asc
-      )
-
-    {:ok, socket}
+    {:ok,
+     assign(socket,
+       tools: tools,
+       search: "",
+       sort_dir: :asc
+     )}
   end
 
   def handle_event("search", %{"search" => search}, socket) do
     tools =
       Catalog.list_tools()
-      |> Enum.filter(fn tool ->
-        String.contains?(String.downcase(tool.name), String.downcase(search)) or
-        String.contains?(String.downcase(tool.description), String.downcase(search))
-      end)
+      |> filter_and_sort(search, socket.assigns.sort_dir)
 
     {:noreply, assign(socket, search: search, tools: tools)}
   end
@@ -32,10 +26,19 @@ defmodule ToolscoutWeb.ToolsListLive do
     new_dir = toggle_dir(socket.assigns.sort_dir)
 
     tools =
-      socket.assigns.tools
-      |> Enum.sort_by(& &1.price, sort_fun(new_dir))
+      Catalog.list_tools()
+      |> filter_and_sort(socket.assigns.search, new_dir)
 
     {:noreply, assign(socket, tools: tools, sort_dir: new_dir)}
+  end
+
+  defp filter_and_sort(tools, search, sort_dir) do
+    tools
+    |> Enum.filter(fn tool ->
+      String.contains?(String.downcase(tool.name), String.downcase(search)) or
+        String.contains?(String.downcase(tool.description), String.downcase(search))
+    end)
+    |> Enum.sort_by(& &1.price, sort_fun(sort_dir))
   end
 
   defp toggle_dir(:asc), do: :desc
@@ -59,6 +62,7 @@ defmodule ToolscoutWeb.ToolsListLive do
           class="flex-1 px-4 py-2 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200"
         />
       </form>
+
       <div class="flex justify-end mb-2">
         <button
           phx-click="toggle_sort"
@@ -68,32 +72,14 @@ defmodule ToolscoutWeb.ToolsListLive do
         </button>
       </div>
 
-      <div>
+      <!-- Desktop Table View -->
+      <div class="hidden md:block">
         <.table id="tools" rows={@tools}>
           <:col :let={tool} label="Name">{tool.name}</:col>
-
-          <:col :let={tool} label="Description">
-            <div class="block md:hidden">
-              <%= String.slice(tool.description, 0, 30) %>...
-            </div>
-            <div class="hidden md:block">
-              <span><%= String.slice(tool.description, 0, 60) %>...</span>
-              <.link
-                phx-click={ToolscoutWeb.CoreComponents.show_modal(%JS{}, "desc-modal-#{tool.id}")}
-                class="ml-2 text-blue-600 hover:underline text-sm"
-              >
-                Show more
-              </.link>
-            </div>
-            <.modal id={"desc-modal-#{tool.id}"} title={"#{tool.name}"}>
-              <p class="text-gray-800 whitespace-pre-wrap"><%= tool.description %></p>
-            </.modal>
+          <:col :let={tool} label="Description" class="hidden md:table-cell">
+            <%= String.slice(tool.description, 0, 60) %>...
           </:col>
-
-          <:col :let={tool} label="Price">
-            $<%= tool.price %>
-          </:col>
-
+          <:col :let={tool} label="Price">${tool.price}</:col>
           <:col :let={tool} label="Actions">
             <div class="flex flex-col md:flex-row gap-2 items-start md:items-center">
               <.link
@@ -115,6 +101,39 @@ defmodule ToolscoutWeb.ToolsListLive do
             </.modal>
           </:col>
         </.table>
+      </div>
+
+      <!-- Mobile Card View -->
+      <div class="block md:hidden space-y-4">
+        <%= for tool <- @tools do %>
+          <div class="p-4 border rounded shadow-sm bg-white">
+            <h3 class="text-lg font-semibold text-zinc-800"><%= tool.name %></h3>
+            <p class="text-sm text-zinc-600 mt-1 mb-2">
+              <%= String.slice(tool.description, 0, 60) %>...
+            </p>
+            <p class="text-sm text-zinc-600 mt-1 mb-2">
+              <b>$<%= tool.price %></b>
+            </p>
+            <.link
+              phx-click={ToolscoutWeb.CoreComponents.show_modal(%JS{}, "modal-mobile-#{tool.id}")}
+              class="inline-block px-4 py-2 text-sm bg-zinc-200 rounded hover:bg-zinc-300"
+            >
+              View Details
+            </.link>
+
+            <.modal id={"modal-mobile-#{tool.id}"} title={tool.name}>
+              <img src={tool.image_link} alt={"Image for #{tool.name}"} class="max-w-full mb-4" />
+              <p class="text-zinc-700 whitespace-pre-wrap mb-4"><%= tool.description %></p>
+              <p class="font-semibold mb-2">Price: $<%= tool.price %></p>
+              <a
+                href="mailto:leach@supertool.com"
+                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"
+              >
+                Email About Tool
+              </a>
+            </.modal>
+          </div>
+        <% end %>
       </div>
     </div>
     """
