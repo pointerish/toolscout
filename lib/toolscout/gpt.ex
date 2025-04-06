@@ -1,10 +1,7 @@
 defmodule Toolscout.Gpt do
   alias Toolscout.Catalog
 
-  @api_url System.get_env("GPT_API_URL")
-  @api_key System.get_env("GPT_API_KEY")
   @gpt_timeout 300_000
-  @gpt_model System.get_env("GPT_MODEL")
   @base_prompt """
   Extract the tools from the following text and convert them to an array of JSON objects
   with the fields name, price, description and image_link. Each tool description has a piece of text
@@ -16,9 +13,12 @@ defmodule Toolscout.Gpt do
   """
 
   def process_prompt(prompt) do
-    dbg(@api_url)
-    dbg(@api_key)
-    dbg(@gpt_model)
+    api_url = System.get_env("GPT_API_URL")
+    api_key = System.get_env("GPT_API_KEY")
+    gpt_model = System.get_env("GPT_MODEL")
+    dbg(api_url)
+    dbg(api_key)
+    dbg(gpt_model)
     headers = [
       {"Content-Type", "application/json"},
       {"Authorization", "Bearer #{@api_key}"}
