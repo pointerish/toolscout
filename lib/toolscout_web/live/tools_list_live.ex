@@ -135,6 +135,9 @@ defmodule ToolscoutWeb.ToolsListLive do
           </div>
         <% end %>
       </div>
+      <button class="mt-4 bg-zinc-200 rounded hover:bg-zinc-300" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
+        <.icon name="hero-arrow-up" />
+      </button>
     </div>
     """
   end
