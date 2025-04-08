@@ -76,7 +76,7 @@ defmodule ToolscoutWeb.ToolsListLive do
       <div class="hidden md:block">
         <.table id="tools" rows={@tools}>
           <:col :let={tool} label="Name">{tool.name}</:col>
-          <:col :let={tool} label="Description" class="hidden md:table-cell">
+          <:col :let={tool} label="Description">
             <%= String.slice(tool.description, 0, 60) %>...
           </:col>
           <:col :let={tool} label="Price">${tool.price}</:col>
@@ -96,7 +96,7 @@ defmodule ToolscoutWeb.ToolsListLive do
               </.link>
             </div>
 
-            <.modal id={"modal-#{tool.id}"} title={"#{tool.name} | $#{tool.price}"}>
+            <.modal id={"modal-#{tool.id}"} title={"#{tool.name} | $#{tool.price}"} footer={tool.description}>
               <img src={tool.image_link} alt={"Image for #{tool.name}"} class="max-w-full" />
             </.modal>
           </:col>

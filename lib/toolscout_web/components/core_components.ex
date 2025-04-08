@@ -40,6 +40,7 @@ defmodule ToolscoutWeb.CoreComponents do
   attr :show, :boolean, default: false
   attr :on_cancel, JS, default: %JS{}
   attr :title, :string, required: false
+  attr :footer, :string, default: nil
   slot :inner_block, required: true
 
   def modal(assigns) do
@@ -83,6 +84,9 @@ defmodule ToolscoutWeb.CoreComponents do
               <div id={"#{@id}-content"}>
                 {render_slot(@inner_block)}
               </div>
+              <%= if @footer do %>
+                <p :if={@footer} class="text-sm leading-6 text-zinc-900 m-2">{@footer}</p>
+              <% end %>
             </.focus_wrap>
           </div>
         </div>
