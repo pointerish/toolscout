@@ -1,6 +1,6 @@
 # Toolscout
 
-Toolscout is web application developed in Phoenix. It exposes a single REST endpoint that's only accesible via API Key auth by a Google Apps Script that forwards an email containing an URL that leads to a raw HTML site that lists vintage woodworking tools for sale.
+Toolscout is a Phoenix-powered web application exposing a single REST endpoint secured with API-key authentication. A Google Apps Script invokes this endpoint to forward emails containing a URL that points to a raw HTML page listing vintage woodworking tools for sale.
 
 Toolscout processes this HTML and creates a LiveView of the listing with price sorting, search and batch sorting capabilities:
 
