@@ -143,8 +143,28 @@ defmodule Toolscout.Catalog do
         |> Map.put(:inserted_at, timestamp)
         |> Map.put(:updated_at, timestamp)
         |> Map.put(:tool_batch_id, tool_batch.id)
+        |> Map.put(:batch_name, month_year_str(5))
       end)
 
     Repo.insert_all(Tool, tools_data)
+  end
+
+  def month_year_str(n, date \\ Date.utc_today()) when is_integer(n) and n >= 0 do
+    days_in_month = Date.days_in_month(date)
+
+    date_to_format =
+      if date.day > days_in_month - n do
+        first_of_next_month(date)
+      else
+        date
+      end
+    Calendar.strftime(date_to_format, "%B %Y")
+  end
+
+  defp first_of_next_month(%Date{year: year, month: 12}) do
+    Date.new!(year + 1, 1, 1)
+  end
+  defp first_of_next_month(%Date{year: year, month: month}) do
+    Date.new!(year, month + 1, 1)
   end
 end
