@@ -45,9 +45,6 @@ defmodule Toolscout.Gpt do
         end
       {:error, reason} ->
         {:error, reason}
-      error ->
-        dbg(error)
-        {:error, error}
     end
   end
 
