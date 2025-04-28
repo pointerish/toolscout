@@ -121,6 +121,20 @@ defmodule Toolscout.Catalog do
     Tool.changeset(tool, attrs)
   end
 
+  def list_batches do
+    Tool
+    |> distinct([t], t.batch_name)
+    |> order_by([t], desc: fragment("to_date(?, 'FMMonth YYYY')", t.batch_name))
+    |> select([t], t.batch_name)
+    |> Repo.all()
+  end
+
+  def list_tools_by_batch_name(batch_name) do
+    Tool
+    |> where([t], t.batch_name == ^batch_name)
+    |> Repo.all()
+  end
+
   def hash_tool_batch(tools_data) do
     :crypto.hash(:sha256, tools_data)
     |> Base.encode16(case: :lower)

@@ -7,6 +7,7 @@ defmodule Toolscout.Catalog.Tool do
     field :description, :string
     field :price, :decimal
     field :image_link, :string
+    field :batch_name, :string
     belongs_to :tool_batch, Toolscout.Catalog.ToolBatch
 
     timestamps(type: :utc_datetime)

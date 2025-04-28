@@ -1,10 +1,10 @@
-<header class="px-4 sm:px-6 lg:px-8">
+<header class="sticky top-0 z-50 bg-white px-4 sm:px-6 lg:px-8">
   <div class="flex items-center justify-between border-b border-zinc-100 py-3 text-sm">
-    <div class="flex items-center gap-4 ">
+    <div class="flex items-center gap-4">
       <a href="/">
         <h1 class="text-4xl font-bold text-gray-800">ToolScout</h1>
       </a>
-      <div class="relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
+      <div class="relative flex items-center gap-4 px-4 sm:px-6 lg:px-8">
         <ul>
           <li class="mt-2">
             <.link
@@ -18,11 +18,9 @@
       </div>
     </div>
   </div>
-  
 </header>
-<main>
-  <div>
-    <.flash_group flash={@flash} />
-    {@inner_content}
-  </div>
+
+<main class="pt-3">  <!-- add a little top padding so content isn’t hidden behind the header -->
+  <.flash_group flash={@flash} />
+  {@inner_content}
 </main>

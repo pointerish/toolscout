@@ -1,36 +1,45 @@
 defmodule ToolscoutWeb.ToolsListLive do
   use ToolscoutWeb, :live_view
 
-  alias Toolscout.Catalog
+  alias Toolscout.{Catalog}
+  import ToolscoutWeb.ToolsFilterComponent, only: [tools_filter: 1]
+  import ToolscoutWeb.ToolsTableComponent, only: [tools_table: 1]
 
   def mount(_params, _session, socket) do
-    tools = Catalog.list_tools()
+    batches = Catalog.list_batches()
+    tools = fetch_tools("", :asc, "")
 
     {:ok,
      assign(socket,
        tools: tools,
        search: "",
-       sort_dir: :asc
+       sort_dir: :asc,
+       by_batch: "",
+       batches: batches
      )}
   end
 
   def handle_event("search", %{"search" => search}, socket) do
-    tools =
-      Catalog.list_tools()
-      |> filter_and_sort(search, socket.assigns.sort_dir)
-
+    tools = fetch_tools(search, socket.assigns.sort_dir, socket.assigns.by_batch)
     {:noreply, assign(socket, search: search, tools: tools)}
   end
 
-  def handle_event("toggle_sort", _params, socket) do
+  def handle_event("toggle_sort", _p, socket) do
     new_dir = toggle_dir(socket.assigns.sort_dir)
-
-    tools =
-      Catalog.list_tools()
-      |> filter_and_sort(socket.assigns.search, new_dir)
-
-    {:noreply, assign(socket, tools: tools, sort_dir: new_dir)}
+    tools = fetch_tools(socket.assigns.search, new_dir, socket.assigns.by_batch)
+    {:noreply, assign(socket, sort_dir: new_dir, tools: tools)}
   end
+
+  def handle_event("by_batch", %{"by_batch" => by_batch}, socket) do
+    tools = fetch_tools(socket.assigns.search, socket.assigns.sort_dir, by_batch)
+    {:noreply, assign(socket, by_batch: by_batch, tools: tools)}
+  end
+
+  defp fetch_tools(search, sort_dir, "" = _all),
+    do: Catalog.list_tools() |> filter_and_sort(search, sort_dir)
+
+  defp fetch_tools(search, sort_dir, batch_name),
+    do: Catalog.list_tools_by_batch_name(batch_name) |> filter_and_sort(search, sort_dir)
 
   defp filter_and_sort(tools, search, sort_dir) do
     tools
@@ -49,95 +58,25 @@ defmodule ToolscoutWeb.ToolsListLive do
 
   def render(assigns) do
     ~H"""
-    <div class="w-[95%] md:w-[75%] mx-auto my-6 md:my-12">
+    <div class="w-full mx-auto my-8 px-4">
+      <div class="flex flex-col md:flex-row gap-6">
+        <!-- on mobile: full-width, margin-bottom; on md+: sidebar & sticky -->
+        <aside class="w-full mb-4 md:w-1/4 md:sticky md:top-16 self-start">
+          <.tools_filter
+            search={@search}
+            sort_dir={@sort_dir}
+            by_batch={@by_batch}
+            batches={@batches}
+          />
+        </aside>
 
-      <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Tool Catalog</h2>
-
-      <form phx-change="search" class="flex flex-col md:flex-row gap-3 mb-6 items-stretch md:items-end">
-        <input
-          type="text"
-          name="search"
-          value={@search}
-          placeholder="Search by name or description..."
-          class="flex-1 px-4 py-2 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200"
-        />
-      </form>
-
-      <div class="flex justify-end mb-2">
-        <button
-          phx-click="toggle_sort"
-          class="text-sm text-blue-600 hover:underline flex items-center gap-1"
-        >
-          Sort by price <%= if @sort_dir == :asc, do: "▲", else: "▼" %>
-        </button>
-      </div>
-
-      <!-- Desktop Table View -->
-      <div class="hidden md:block">
-        <.table id="tools" rows={@tools}>
-          <:col :let={tool} label="Name">{tool.name}</:col>
-          <:col :let={tool} label="Description">
-            <%= String.slice(tool.description, 0, 60) %>...
-          </:col>
-          <:col :let={tool} label="Price">${tool.price}</:col>
-          <:col :let={tool} label="Actions">
-            <div class="flex flex-col md:flex-row gap-2 items-start md:items-center">
-              <.link
-                phx-click={ToolscoutWeb.CoreComponents.show_modal(%JS{}, "modal-#{tool.id}")}
-                class="px-4 py-2 text-sm bg-zinc-200 rounded hover:bg-zinc-300 text-center w-full md:w-auto"
-              >
-                <.icon name="hero-eye" /> View
-              </.link>
-              <.link
-                navigate={"mailto:leach@supertool.com"} target="_blank"
-                class="px-4 py-2 text-sm bg-zinc-200 rounded hover:bg-zinc-300 text-center w-full md:w-auto"
-              >
-                <.icon name="hero-envelope" /> Email
-              </.link>
-            </div>
-
-            <.modal id={"modal-#{tool.id}"} title={"#{tool.name} | $#{tool.price}"} footer={tool.description}>
-              <img src={tool.image_link} alt={"Image for #{tool.name}"} class="max-w-full" />
-            </.modal>
-          </:col>
-        </.table>
-      </div>
-
-      <!-- Mobile Card View -->
-      <div class="block md:hidden space-y-4">
-        <%= for tool <- @tools do %>
-          <div class="p-4 border rounded shadow-sm bg-white">
-            <h3 class="text-lg font-semibold text-zinc-800"><%= tool.name %></h3>
-            <p class="text-sm text-zinc-600 mt-1 mb-2">
-              <%= String.slice(tool.description, 0, 60) %>...
-            </p>
-            <p class="text-sm text-zinc-600 mt-1 mb-2">
-              <b>$<%= tool.price %></b>
-            </p>
-            <.link
-              phx-click={ToolscoutWeb.CoreComponents.show_modal(%JS{}, "modal-mobile-#{tool.id}")}
-              class="inline-block px-4 py-2 text-sm bg-zinc-200 rounded hover:bg-zinc-300"
-            >
-              View Details
-            </.link>
-
-            <.modal id={"modal-mobile-#{tool.id}"} title={tool.name}>
-              <img src={tool.image_link} alt={"Image for #{tool.name}"} class="max-w-full mb-4" />
-              <p class="text-zinc-700 whitespace-pre-wrap mb-4"><%= tool.description %></p>
-              <p class="font-semibold mb-2">Price: $<%= tool.price %></p>
-              <a
-                href="mailto:leach@supertool.com"
-                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"
-              >
-                Email About Tool
-              </a>
-            </.modal>
+        <main class="flex-1">
+          <!-- wrap your table in an overflow container on small -->
+          <div class="overflow-x-auto md:overflow-visible">
+            <.tools_table tools={@tools} />
           </div>
-        <% end %>
+        </main>
       </div>
-      <button class="mt-4 bg-zinc-200 rounded hover:bg-zinc-300" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
-        <.icon name="hero-arrow-up" />
-      </button>
     </div>
     """
   end
