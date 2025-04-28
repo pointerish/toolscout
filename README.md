@@ -1,18 +1,47 @@
 # Toolscout
 
-To start your Phoenix server:
+Toolscout is web application developed in Phoenix. It exposes a single REST endpoint that's only accesible via API Key auth by a Google Apps Script that forwards an email containing an URL that leads to a raw HTML site that lists vintage woodworking tools for sale.
 
-  * Run `mix setup` to install and setup dependencies
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+Toolscout processes this HTML and creates a LiveView of the listing with price sorting, search and batch sorting capabilities:
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+![Toolscout Desktop View](priv/static/readme-screenshots/desktop-ts.png)
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+It's also designed to be responsive:
+![Toolscout Mobile View](priv/static/readme-screenshots/mobile-ts.png)
 
-## Learn more
+### Useful Commands
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+- `mix setup` - Install dependencies and set up the project
+- `mix test` - Run tests
+- `mix assets.deploy` - Compile assets for production
+- `mix phx.gen.secret` - Generate a new secret key base
+
+## Production
+
+The app has been deployed at Fly.io [here](htts://toolscout.fly.dev).
+
+
+## Security
+
+- Token authentication for API
+- CSRF protection
+- Password encryption with bcrypt
+- Recommended SSL configuration for production
+
+## Contributing
+
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Resources
+
+- [Phoenix Documentation](https://hexdocs.pm/phoenix)
+- [Deployment Guides](https://hexdocs.pm/phoenix/deployment.html)
+- [Elixir Forum](https://elixirforum.com/c/phoenix-forum)
