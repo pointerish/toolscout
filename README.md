@@ -18,7 +18,7 @@ It's also designed to be responsive:
 
 ## Production
 
-The app has been deployed at Fly.io [here](htts://toolscout.fly.dev).
+The app has been deployed at Fly.io [here](https://toolscout.fly.dev).
 
 
 ## Security
