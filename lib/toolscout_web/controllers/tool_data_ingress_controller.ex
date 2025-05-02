@@ -17,27 +17,12 @@ defmodule ToolscoutWeb.ToolDataIngress do
       "" ->
         json(conn, %{error: "Empty raw data"})
       _ ->
-        process_tool_data(conn, raw_tool_data)
+        Task.start(fn ->
+          Gpt.process_prompt(raw_tool_data)
+        end)
+        json(conn, %{
+          message: "Tool batch processing scheduled."
+        })
     end
-  end
-
-  defp process_tool_data(conn, raw_tool_data) do
-      Task.start(fn ->
-        Gpt.process_prompt(raw_tool_data)
-      end)
-      json(conn, %{
-        message: "Tool batch processing scheduled."
-      })
-    # case ToolDataIngress.is_tool_batch_new?(raw_tool_data) do
-    #   true ->
-    #     Task.start(fn ->
-    #       Gpt.process_prompt(raw_tool_data)
-    #     end)
-    #     json(conn, %{
-    #       message: "Tool batch is new. Processing started."
-    #     })
-    #   false ->
-    #     json(conn, %{message: "Old tool batch. No new tools added."})
-    # end
   end
 end
