@@ -40,6 +40,16 @@ defmodule Toolscout.Catalog do
     Repo.one(query)
   end
 
+  def get_latest_tool_batch_name do
+    query =
+      from t in Tool,
+        order_by: [desc: t.inserted_at],
+        limit: 1
+
+    tool = Repo.one(query)
+    tool.batch_name
+  end
+
   @doc """
   Gets a single tool.
 

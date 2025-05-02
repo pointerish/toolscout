@@ -1,12 +1,13 @@
 defmodule ToolscoutWeb.ToolsListLive do
   use ToolscoutWeb, :live_view
 
-  alias Toolscout.{Catalog}
+  alias Toolscout.Catalog
   import ToolscoutWeb.ToolsFilterComponent, only: [tools_filter: 1]
   import ToolscoutWeb.ToolsTableComponent, only: [tools_table: 1]
 
   def mount(_params, _session, socket) do
     batches = Catalog.list_batches()
+    latest_batch_name = Catalog.get_latest_tool_batch_name()
     tools = fetch_tools("", :asc, "")
 
     {:ok,
@@ -14,7 +15,7 @@ defmodule ToolscoutWeb.ToolsListLive do
        tools: tools,
        search: "",
        sort_dir: :asc,
-       by_batch: "",
+       by_batch: latest_batch_name,
        batches: batches
      )}
   end
